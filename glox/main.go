@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crafting-interpreters/internal"
+	"crafting-interpreters/internal/loxerr"
 	"errors"
 	"fmt"
 	"io"
@@ -28,33 +30,32 @@ func main() {
 }
 
 func runFile(filePath string) error {
-	print("Running GLOX with input file: " + filePath)
+	fmt.Println("Running GLOX with input file: " + filePath)
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return errors.New(fmt.Sprintf("File %s does not exist", filePath))
 	}
+
+	glox := internal.Glox{}
 
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
 
-	if err := run(string(data)); err != nil {
+	if err := glox.Run(string(data)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func run(input string) error {
-	println(input)
-	return nil
-}
-
 func runPrompt() error {
 	print("Running GLOX in REPL mode")
 
+	glox := internal.Glox{}
 	for {
-		print("> ")
+		fmt.Print("> ")
+		glox.ResetError()
 		reader, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return err
@@ -63,7 +64,10 @@ func runPrompt() error {
 		if input == "" {
 			break
 		}
-		if err := run(input); err != nil {
+		if err := glox.Run(input); err != nil {
+			if errors.Is(err, loxerr.GloxError{}) {
+				continue
+			}
 			return err
 		}
 	}
