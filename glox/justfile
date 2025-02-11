@@ -1,0 +1,8 @@
+glox-build:
+    go build main.go
+
+glox-repl:
+    go run main.go
+
+glox file:
+    go run main.go {{file}}

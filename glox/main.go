@@ -60,13 +60,13 @@ func runPrompt() error {
 			return err
 		}
 		input := strings.TrimSpace(string(reader))
-		if input == "exit" {
+		if input == "" {
 			break
 		}
 		if err := run(input); err != nil {
 			return err
 		}
 	}
-	print("GLOX exiting")
+	print("\nGLOX exiting")
 	return nil
 }
