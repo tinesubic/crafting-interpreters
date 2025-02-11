@@ -1,21 +1,72 @@
 package main
 
 import (
-  "fmt"
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"strings"
 )
 
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
 func main() {
-  //TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-  // to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-  s := "gopher"
-  fmt.Printf("Hello and welcome, %s!\n", s)
+	args := os.Args
+	if len(args) == 2 {
+		if err := runFile(args[1]); err != nil {
+			panic(err)
+		}
+	} else if len(args) > 2 {
+		print("Usage: glox [input file]")
+		os.Exit(1)
+	} else {
+		if err := runPrompt(); err != nil {
+			panic(err)
+		}
+	}
+}
 
-  for i := 1; i <= 5; i++ {
-	//TIP <p>To start your debugging session, right-click your code in the editor and select the Debug option.</p> <p>We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-	// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.</p>
-	fmt.Println("i =", 100/i)
-  }
+func runFile(filePath string) error {
+	print("Running GLOX with input file: " + filePath)
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return errors.New(fmt.Sprintf("File %s does not exist", filePath))
+	}
+
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	if err := run(string(data)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func run(input string) error {
+	println(input)
+	return nil
+}
+
+func runPrompt() error {
+	print("Running GLOX in REPL mode")
+
+	for {
+		print("> ")
+		reader, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return err
+		}
+		input := strings.TrimSpace(string(reader))
+		if input == "exit" {
+			break
+		}
+		if err := run(input); err != nil {
+			return err
+		}
+	}
+	print("GLOX exiting")
+	return nil
 }
