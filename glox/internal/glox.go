@@ -1,9 +1,8 @@
 package internal
 
 import (
-	"crafting-interpreters/internal/loxerr"
 	"crafting-interpreters/internal/scanner"
-	"fmt"
+	"crafting-interpreters/internal/util/loxerr"
 )
 
 type Glox struct {
@@ -12,13 +11,9 @@ type Glox struct {
 
 func (g *Glox) Run(input string) error {
 	scanner := scanner.NewScanner(input)
-	tokens, err := scanner.ScanTokens()
+	_, err := scanner.ScanTokens()
 	if err != nil {
 		return err
-	}
-
-	for _, token := range tokens {
-		fmt.Println(token)
 	}
 
 	if g.hadError {

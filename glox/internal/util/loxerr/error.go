@@ -16,7 +16,7 @@ func ReportError(line int, message string) {
 }
 
 func report(line int, what string, where string, msg string) {
-	if _, err := fmt.Fprintf(os.Stderr, "[%s] %s %s: %s", line, what, where, msg); err != nil {
+	if _, err := fmt.Fprintf(os.Stderr, "[%d] %s %s: %s", line, what, where, msg); err != nil {
 		panic(err)
 	}
 }

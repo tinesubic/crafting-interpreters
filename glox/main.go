@@ -2,7 +2,7 @@ package main
 
 import (
 	"crafting-interpreters/internal"
-	"crafting-interpreters/internal/loxerr"
+	"crafting-interpreters/internal/util/loxerr"
 	"errors"
 	"fmt"
 	"io"
