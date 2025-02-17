@@ -24,6 +24,10 @@ func NewScanner(source string) *Scanner {
 	}
 }
 
+func (s *Scanner) LogDebug(msg string) {
+	loxerr.Debug(s.line, fmt.Sprintf("[Scanner] %s", msg))
+}
+
 func (s *Scanner) ScanTokens() ([]Token, error) {
 	for {
 		if s.isAtEnd() {
@@ -33,6 +37,8 @@ func (s *Scanner) ScanTokens() ([]Token, error) {
 		token := s.scanToken()
 		if token == nil {
 			continue
+		} else {
+			//s.LogDebug(fmt.Sprintf("Token: %v, Lexeme: %s", token.Type, token.Lexeme))
 		}
 		s.tokens = append(s.tokens, *token)
 	}
@@ -51,41 +57,82 @@ func (s *Scanner) isAtEnd() bool {
 func (s *Scanner) scanToken() *Token {
 	c := s.advance()
 	switch c {
-	case " ", "\t", "\r":
-		return nil
-	case "(":
+	case ' ', '\t', '\r':
+		return nil // skip any whitespace
+	case '(':
 		return s.tokenize(LEFT_PAREN)
-	case ")":
+	case ')':
 		return s.tokenize(RIGHT_PAREN)
-	case "{":
+	case '{':
 		return s.tokenize(LEFT_BRACE)
-	case "}":
+	case '}':
 		return s.tokenize(RIGHT_BRACE)
-	case ",":
+	case ',':
 		return s.tokenize(COMMA)
-	case ".":
+	case '.':
 		return s.tokenize(DOT)
-	case "+":
+	case '+':
 		return s.tokenize(PLUS)
-	case "-":
+	case '-':
 		return s.tokenize(MINUS)
-	case "/":
-		return s.tokenize(SLASH)
-	case "*":
+	case '*':
 		return s.tokenize(STAR)
-	case "\n":
+	case '\n':
 		s.line++
 		return nil
+	case '!':
+		if s.matchNext('=') {
+			return s.tokenize(NOT_EQUAL)
+		} else {
+			return s.tokenize(NOT)
+		}
+	case '>':
+		if s.matchNext('=') {
+			return s.tokenize(GREATER_EQUAL)
+		} else {
+			return s.tokenize(GREATER_THAN)
+		}
+	case '<':
+		if s.matchNext('=') {
+			return s.tokenize(LESS_EQUAL)
+		} else {
+			return s.tokenize(LESS_THAN)
+		}
+	case '=':
+		if s.matchNext('=') {
+			return s.tokenize(EQUAL_EQUAL)
+		} else {
+			return s.tokenize(EQUAL)
+		}
+	case '/':
+		if s.matchNext('/') {
+			for s.peek() != NEWLINE && !s.isAtEnd() {
+				_ = s.advance() // ignore comment data
+			}
+			return nil
+		} else {
+			return s.tokenize(SLASH)
+		}
+	case '"':
+		return s.parseString()
 	default:
-		loxerr.ReportError(s.line, fmt.Sprintf("Unexpected character %q at position %d\n", c, s.start))
+		loxerr.ReportError(s.line, fmt.Sprintf("Unexpected character %q at position %d", c, s.start))
 	}
 	return nil
 }
 
-func (s *Scanner) advance() string {
+func (s *Scanner) advance() byte {
 	var next = s.source[s.current]
 	s.current += 1
-	return string(next)
+	return next
+}
+
+func (s *Scanner) peek() byte {
+	if s.isAtEnd() {
+		return 0
+	} else {
+		return s.source[s.current]
+	}
 }
 
 func (s *Scanner) tokenize(tokenType TokenType) *Token {
@@ -96,4 +143,19 @@ func (s *Scanner) tokenize(tokenType TokenType) *Token {
 		Literal: nil,
 		Lexeme:  text,
 	}
+}
+
+func (s *Scanner) matchNext(expected byte) bool {
+	if s.isAtEnd() {
+		return false
+	}
+	if s.source[s.current] != expected {
+		return false
+	}
+	s.current += 1
+	return true
+}
+
+func (s *Scanner) parseString() *Token {
+	// TODO
 }

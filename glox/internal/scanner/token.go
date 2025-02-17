@@ -5,6 +5,10 @@ import "fmt"
 type TokenType int
 
 const (
+	NEWLINE = '\n'
+)
+
+const (
 	EOF       TokenType = iota
 	SEMICOLON TokenType = iota
 
@@ -61,5 +65,5 @@ type Token struct {
 }
 
 func (t *Token) String() string {
-	return fmt.Sprintf("%s:%s:%v", t.Type, t.Lexeme, t.Literal)
+	return fmt.Sprintf("%s:%v", t.Lexeme, t.Literal)
 }

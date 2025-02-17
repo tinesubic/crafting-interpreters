@@ -17,7 +17,9 @@ func (g *Glox) Run(input string) error {
 	}
 
 	if g.hadError {
-		return loxerr.GloxError{}
+		return loxerr.GloxError{
+			Phase: loxerr.ScannerPhase,
+		}
 	}
 
 	return nil
