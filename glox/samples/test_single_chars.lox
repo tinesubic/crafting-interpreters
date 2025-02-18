@@ -20,3 +20,9 @@ nil class fun
 return super this var
 // comment
 // more comment
+"my strin\ng"
+
+123
+232.12
+.123
+234.

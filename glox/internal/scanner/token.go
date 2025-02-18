@@ -5,7 +5,9 @@ import "fmt"
 type TokenType int
 
 const (
-	NEWLINE = '\n'
+	NEWLINE  = '\n'
+	QUOTE    = '"'
+	DOT_RUNE = '.'
 )
 
 const (
@@ -56,6 +58,24 @@ const (
 	THIS   TokenType = iota
 	VAR    TokenType = iota
 )
+
+var reservedKeywords = map[string]TokenType{
+	"and":    AND,
+	"or":     OR,
+	"if":     IF,
+	"else":   ELSE,
+	"for":    FOR,
+	"while":  WHILE,
+	"false":  FALSE,
+	"true":   TRUE,
+	"nil":    NIL,
+	"class":  CLASS,
+	"fun":    FUN,
+	"return": RETURN,
+	"super":  SUPER,
+	"this":   THIS,
+	"var":    VAR,
+}
 
 type Token struct {
 	Type    TokenType
